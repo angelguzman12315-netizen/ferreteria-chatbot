@@ -5,23 +5,27 @@ exports.handler = async function(event) {
 
   const { messages, system } = JSON.parse(event.body);
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  // Convertir formato de mensajes para OpenAI
+  const openaiMessages = [
+    { role: 'system', content: system },
+    ...messages
+  ];
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'gpt-4o-mini',
       max_tokens: 1000,
-      system,
-      messages
+      messages: openaiMessages
     })
   });
 
   const data = await response.json();
-  const reply = data.content?.[0]?.text || 'No se pudo obtener respuesta.';
+  const reply = data.choices?.[0]?.message?.content || 'No se pudo obtener respuesta.';
 
   return {
     statusCode: 200,
