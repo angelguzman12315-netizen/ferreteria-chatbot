@@ -5,20 +5,19 @@ exports.handler = async function(event) {
 
   const { messages, system } = JSON.parse(event.body);
 
-  // Convertir formato de mensajes para OpenAI
   const openaiMessages = [
     { role: 'system', content: system },
     ...messages
   ];
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'llama3-8b-8192',
       max_tokens: 1000,
       messages: openaiMessages
     })
@@ -33,3 +32,4 @@ exports.handler = async function(event) {
     body: JSON.stringify({ reply })
   };
 };
+
